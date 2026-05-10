@@ -80,6 +80,32 @@ app.get("/depth", (req: Request, res: Response) => {
       quantity: number;
     };
   } = {};
+
+  for (let i = 0; i < bids.length; i++) {
+    if (!depth[bids[i].price]) {
+      depth[bids[i].price] = {
+        quantity: bids[i].quantity,
+        type: "bid",
+      };
+    } else {
+      depth[bids[i].price].quantity += bids[i].quantity;
+    }
+  }
+
+  for (let i = 0; i < asks.length; i++) {
+    if (!depth[asks[i].price]) {
+      depth[asks[i].price] = {
+        quantity: asks[i].quantity,
+        type: "bid",
+      };
+    } else {
+      depth[asks[i].price].quantity += asks[i].quantity;
+    }
+  }
+
+  res.json({
+    depth,
+  });
 });
 
 function flipBalance(
