@@ -44,6 +44,42 @@ const asks: Order[] = [];
 
 app.post("/order", (req: Request, res: Response) => {
   const { side, price, quantity, userId } = req.body;
+
+  const remainingQuantity = fillOrders(side, price, quantity, userId);
+
+  if (remainingQuantity == 0) {
+    res.json({ filledQuantity: quantity });
+    return;
+  }
+
+  if (side == "bid") {
+    bids.push({
+      userId,
+      price,
+      quantity: remainingQuantity,
+    });
+    bids.sort((a, b) => (a.price < b.price ? -1 : 1));
+  } else {
+    asks.push({
+      userId,
+      price,
+      quantity: remainingQuantity,
+    });
+    asks.sort((a, b) => (a.price < b.price ? 1 : -1));
+  }
+
+  res.json({
+    filledQuantity: quantity - remainingQuantity,
+  });
+});
+
+app.get("/depth", (req: Request, res: Response) => {
+  const depth: {
+    [price: string]: {
+      type: "bid" | "ask";
+      quantity: number;
+    };
+  } = {};
 });
 
 function flipBalance(
