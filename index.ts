@@ -92,6 +92,19 @@ app.get("/depth", (req: Request, res: Response) => {
     }
   }
 
+  app.get("/balance/:userId", (req, res) => {
+    const userId = req.params.userId;
+    const user = users.find((x) => x.id == userId);
+    if (!user) {
+      return res.json({
+        USD: 0,
+        [TICKER]: 0,
+      });
+    }
+
+    res.json({ balances: user.balances });
+  });
+
   for (let i = 0; i < asks.length; i++) {
     if (!depth[asks[i].price]) {
       depth[asks[i].price] = {
